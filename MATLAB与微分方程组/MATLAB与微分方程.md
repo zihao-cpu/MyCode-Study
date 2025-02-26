@@ -177,5 +177,60 @@ lags=[1,3];
 history=[0,0,1];
 tspan=[0,8];
 sol2=dde23('ddeffun2',lags,history,tspan);
+
+
+```
+
+# 复杂高阶微分方程的变换与求解
+
+## 含有最高阶导数二次方的微分方程
+
+$$
+[y^{n}(t)]^2=f(t,y(t),y^\text'(t), \ldots,y^{n-1}(t))
+$$
+
+$$
+x_1(t)=y(t),x_2(t)=y^\text'(t),\ldots,x_n(t)=y^{n-1}(t)
+$$
+
+$$
+例子：(y^\text{''}(t))^2=4(ty^\text'(t)-y(t))+2y^\text'(t)+1
+$$
+
+$$
+x_1(t)=y(t),x_2(t)=y^\text'(t)\\x^\text'(t)=\left[ \begin{array}{c} x_2(t)\\-\sqrt{4(tx_2(t)-x_1(t))+2x_2(t)+1}  \end{array} \right]
+$$
+
+```matlab
+ff=odeset;ff.AbsTol=1e-8;ff.RelTol=1e-8;
+f=@(t,x)[x(2);sqrt(4*(t*x(2)-x(1))+2*x(2)+1)];
+[t1,x1]=ode45(f,[0,1],[0;0.1,ff]);x1=real(x1(:,1));
+[t2,x2]=ode45(f,[0,1],[0;0.1],ff);
+x2=real(x2(:,1))
+
+```
+
+# 含有最高阶导数的非线性运算
+
+$$
+(y^\text{''}(t))^3+3y^\text{''}(t)\text siny(t)+3y^\text'siny^ \text{''}(t)=e^{-3t}\\y(0)=1,y^\text'(0)=-1
+$$
+
+$$
+设：x_1(t)=y(t),x_2(t)=y^\text'(t),p(t)=y''(t)
+$$
+
+$$
+化简：p^3(t)+3p(t)sinx_1(t)+3x_2(t)sinp(t)-e^{-3t}=0\\
+\bf{x}^\text '(t)=\left[ \begin{array}{c} x_2(t)\\p(t)\end{array}\right]
+$$
+
+```matlab
+function dx=c4exode1(t,x)
+f=@(p)p^3+3*p*sin(x(1))+3*x(2)*sin(p)-exp(-3*t);
+ff=optimset;ff.Tolx=eps;ff.TolFun=eps;
+p=fsolve(f,x(1),ff);df[x(2);p];
+ff=odeset;ff.AbsTol=100*eps;ff.RelTol=100*eps;
+[t,x]=ode45(@c4exode1,[0,4],[1;-1],ff);
 ```
 
