@@ -210,7 +210,8 @@ x2=real(x2(:,1))
 
 ```
 
-# 含有最高阶导数的非线性运算
+## 含有最高阶导数的非线性运算
+
 
 $$
 (y^\text{''}(t))^3+3y^\text{''}(t)\text siny(t)+3y^\text'siny^ \text{''}(t)=e^{-3t}\\y(0)=1,y^\text'(0)=-1
@@ -234,3 +235,12 @@ ff=odeset;ff.AbsTol=100*eps;ff.RelTol=100*eps;
 [t,x]=ode45(@c4exode1,[0,4],[1;-1],ff);
 ```
 
+# 矩阵型微分方程
+
+$$
+MX''(t)+CX'(t)+KX(t)=F\mu(t)
+$$
+
+M,C,K是$$n*n$$ 的矩阵 X,F是$$n*1$$ 的列向量
+
+引入:$$x_1(t)=X(t),x_2(t)=X'(t),则x^\text'_1=x_2(t),x^\text'_2(t)=X''(T)$$
