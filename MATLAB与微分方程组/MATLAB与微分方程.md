@@ -244,3 +244,86 @@ $$
 M,C,K是$$n*n$$ 的矩阵 X,F是$$n*1$$ 的列向量
 
 引入:$$x_1(t)=X(t),x_2(t)=X'(t),则x^\text'_1=x_2(t),x^\text'_2(t)=X''(T)$$
+
+
+
+#Neural mass model
+
+**为什么将复数分解为实部和虚部？**
+
+复数变量 $$  z_i = x_i + j y_i $$ 中，$$ x_i $$ 是实部，$$ y_i $$ 是虚部。复数的操作通常涉及到它的模和幅角，或者直接在实部和虚部之间进行计算。在你的方程中，复数的出现通常意味着这两个部分（实部和虚部）都需要独立地演化，进而影响整个系统的动态。
+
+**你的方程中有复数项：**
+
+$$\frac{dz_i}{dt} = \left( a_i + j \omega_i - |z_i|^2 \right) z_i + \sigma_{in} \xi_i$$
+
+其中 $$ |z_i|^2 = x_i^2 + y_i^2$$ 是复数 $$z_i $$ 的模的平方，$$j $$ 是虚数单位。因此，复数的演化不仅仅影响实部，还影响虚部。
+
+**复数求解的步骤通常是：**
+
+1. **分解复数为实部和虚部**：复数 $$ z_i $$ 可以写为 $$ z_i = x_i + j y_i $$，其中 $$ x_i $$ 和 $$ y_i $$ 是实部和虚部。
+2. **分别求解实部和虚部**：将原方程中的复数 $$ z_i $$ 代入 $$ z_i = x_i + j y_i $$ 后，我们得到两个新的方程：一个描述实部 $$ x_i $$，另一个描述虚部 $$ y_i $$。
+3. **使用数值方法求解**：这些新方程是普通的实数微分方程，可以使用标准的数值方法（如 `ode45`）进行求解。
+
+在 MATLAB 中，复数被自动处理，但为了方便操作和理解，我们将复数方程分解成两个实数方程，并用实数求解方法进行求解。这样可以确保每一部分的物理意义更加清晰，同时可以利用现有的数值解法。
+
+**数值解法的步骤：**
+
+1. **分解复数变量**：在 MATLAB 中，我们将复数变量分解为实部和虚部，分别处理。即 $$ z_i $$ 被表示为实部 $$ x_i  $$ 和虚部 $$ y_i $$。
+2. **定义方程**：根据给定的微分方程，分别对实部和虚部编写对应的方程。
+3. **使用 `ode45` 求解**：通过 MATLAB 的 `ode45` 函数来数值求解这些方程。
+4. **合并结果**：求解完成后，得到的实部和虚部可以组合成复数解。
+
+$$\frac{dy_i}{dt} = (a_i - x_i^2 - y_i^2) y_i + \omega_i x_i + g \sum_{j=1}^N W_{ij} (y_j - y_i) \sigma_{in} \xi_i$$
+
+$$\frac{dx_i}{dt} = (a_i - x_i^2 - y_i^2) x_i + \omega_i y_i + g \sum_{j=1}^N W_{ij} (x_j - x_i) \sigma_{in} \xi_i$$
+
+```matlab
+% Define parameters
+N = 10; % Number of variables
+a = rand(1, N); % Vector of a_i constants
+omega = rand(1, N); % Vector of omega_i constants
+g = 1; % Coupling constant
+sigma_in = 0.1; % Noise standard deviation
+W = rand(N, N); % Weight matrix (randomly initialized)
+xi = randn(1, N); % Random noise term
+
+% Define the system of differential equations
+% xi and yi are the vectors containing x_i(t) and y_i(t) values
+
+dxdt = @(t, z) [(a - z(1:N).^2 - z(N+1:2*N).^2) .* z(1:N) - omega .* z(N+1:2*N) + g * W * (z(1:N) - z(1:N)') + sigma_in * xi';
+                (a - z(1:N).^2 - z(N+1:2*N).^2) .* z(N+1:2*N) + omega .* z(1:N) + g * W * (z(N+1:2*N) - z(N+1:N)') + sigma_in * xi'];
+
+% Time vector
+tspan = [0 100]; % Time range
+
+% Initial conditions for x_i and y_i
+x0 = zeros(N, 1);
+y0 = zeros(N, 1);
+z0 = [x0; y0]; % Initial state vector
+
+% Solve the system of equations
+[t, z] = ode45(@(t, z) dxdt(t, z), tspan, z0);
+
+% Extract the solutions for x_i and y_i
+x = z(:, 1:N);
+y = z(:, N+1:end);
+
+% Plot the results
+figure;
+subplot(2, 1, 1);
+plot(t, x);
+xlabel('Time');
+ylabel('x_i(t)');
+title('Solution for x_i(t)');
+legend(arrayfun(@(i) sprintf('x_%d(t)', i), 1:N, 'UniformOutput', false));
+
+subplot(2, 1, 2);
+plot(t, y);
+xlabel('Time');
+ylabel('y_i(t)');
+title('Solution for y_i(t)');
+legend(arrayfun(@(i) sprintf('y_%d(t)', i), 1:N, 'UniformOutput', false));
+
+```
+
