@@ -121,3 +121,63 @@ $$
 \hat{F} = \rho \mathcal{L} \mathcal{L}(K \| S)
 $$
 
+ 
+
+##训练过程数学公式总结
+
+###Forward Pass
+
+1. **扩散核计算**：
+   $$
+   K_i = U e^{-s \Lambda} U^T \delta_i \tag{12}
+   $$
+
+2. **结构连接特征**（常量）：
+   $$
+   S_i = U U^T \delta_i \tag{13}
+   $$
+
+3. **拼接输入向量**：
+   $$
+   x_i = [K_i \| S_i] \tag{14}
+   $$
+
+4. **线性映射得到预测 FC 向量**：
+   $$
+   y_i = x_i W^T \tag{15}
+   $$
+
+5. **损失函数计算**（Frobenius norm）：
+   $$
+   \mathcal{L}_i = \sum_i \| y_i - \hat{y}_i \|_2^2 \tag{16}
+   $$
+
+
+###Backward Pass
+
+6. **梯度计算**（链式法则）：
+   $$
+   \frac{\partial \mathcal{L}_i}{\partial s} = \frac{\partial \mathcal{L}_i}{\partial y_i} \cdot \frac{\partial y_i}{\partial x_i} \cdot \frac{\partial x_i}{\partial s} \tag{17}
+   $$
+
+7. **具体梯度表达式**：
+   $$
+   \frac{\partial \mathcal{L}_i}{\partial s} = -2 \sum (y_i - \hat{y}_i) W^T \Lambda x_i(s) \tag{18}
+   $$
+
+8. **梯度下降更新扩散尺度 \( s \)**：
+   $$
+   s^{(t+1)} = s^{(t)} - \eta \frac{\partial \mathcal{L}_i}{\partial s} \tag{19}
+   $$
+
+
+
+
+###总结表格
+
+| 步骤       | 公式/内容                                    |
+| -------- | ---------------------------------------- |
+| **前向传播** | 计算扩散核、结构特征、拼接向量及预测 FC 向量                 |
+| **损失函数** | $$ \mathcal{L}_i = \sum_i \| y_i - \hat{y}_i \|_2^2 $$ |
+| **梯度计算** | 使用链式法则计算梯度：$$ \frac{\partial \mathcal{L}_i}{\partial s} = -2 \sum (y_i - \hat{y}_i) W^T \Lambda x_i(s) $$ |
+| **梯度下降** | $$ s^{(t+1)} = s^{(t)} - \eta \frac{\partial \mathcal{L}_i}{\partial s} $$ |
