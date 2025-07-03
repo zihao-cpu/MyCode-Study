@@ -153,6 +153,7 @@ $$
    $$
 
 
+
 ###Backward Pass
 
 6. **梯度计算**（链式法则）：
@@ -169,6 +170,7 @@ $$
    $$
    s^{(t+1)} = s^{(t)} - \eta \frac{\partial \mathcal{L}_i}{\partial s} \tag{19}
    $$
+
 
 
 
