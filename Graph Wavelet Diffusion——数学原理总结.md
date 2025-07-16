@@ -25,9 +25,7 @@ $$
 
 其中 $\mathcal{L}$ 是归一化拉普拉斯矩阵。
 
-- $$
-- \mathbf{x}(t) \in \mathbb{R}^N
-- $$：图上所有节点的状态向量（例如每个大脑区域的活动值）；
+- $$ \mathbf{x}(t) \in \mathbb{R}^N $$：图上所有节点的状态向量（例如每个大脑区域的活动值）；
 - $$ \mathcal{L} \in \mathbb{R}^{N \times N} $$：图拉普拉斯矩阵，代表图结构；
 - 初始条件为：$$ \mathbf{x}(0) = \mathbf{x}_0 $$
 
